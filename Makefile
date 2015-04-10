@@ -1,23 +1,26 @@
+
 .PHONY: test deps
 
+REBAR=$(shell which rebar > /dev/null 2>&1 && echo "rebar" || "./rebar")
+
 rafter:
-	./rebar compile
+	$(REBAR) compile
 deps:
-	./rebar get-deps
+	$(REBAR) get-deps
 test:
-	./rebar eunit skip_deps=true
+	$(REBAR) eunit skip_deps=true
 
 APPS = kernel stdlib sasl erts ssl tools os_mon runtime_tools crypto inets \
 	xmerl webtool eunit syntax_tools compiler
-PLT = $(HOME)/.rafter_dialyzer_plt
+PLT = rafter_dialyzer.plt
 
-check_plt: 
+check_plt:
 	dialyzer --check_plt --plt $(PLT) --apps $(APPS)
 
-build_plt: 
+build_plt:
 	dialyzer --build_plt --output_plt $(PLT) --apps $(APPS)
 
-dialyzer: 
+dialyzer:
 	@echo
 	@echo Use "'make check_plt'" to check PLT prior to using this target.
 	@echo Use "'make build_plt'" to build PLT prior to using this target.
@@ -36,4 +39,5 @@ cleanplt:
 	rm $(PLT)
 
 xref: compile
-	./rebar xref skip_deps=true | grep -v unused | egrep -v -f ./xref.ignore-warnings
+	$(REBAR) xref skip_deps=true | grep -v unused | egrep -v -f ./xref.ignore-warnings
+
